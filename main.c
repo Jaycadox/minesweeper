@@ -49,6 +49,8 @@ struct game {
 	unsigned short num_flags;
 	bool game_over;
 	bool won;
+	double time_start;
+	double time_end;
 };
 
 static struct game GAME = {0};
@@ -80,6 +82,14 @@ int main (void) {
 	Texture2D mine_tile = LoadTextureFromImage(mine_tile_img);
 
 	while (!WindowShouldClose()) {
+		double time = GetTime();
+		if (!GAME.mines_generated) {
+			GAME.time_start = time;
+			GAME.time_end = time;	
+		} else if (!GAME.game_over) {
+			GAME.time_end = time;
+		}
+
 		BeginDrawing();
 		ClearBackground(BLACK);
 
@@ -266,6 +276,17 @@ void draw_menu (Texture2D* flag) {
 	DrawTextureEx(*flag, (Vector2){5, 5}, 0.0f, 2.0f, WHITE);
 	DrawText(buff, (GAME_WIDTH / BOARD_SIZE) + 12, 12, 20, WHITE);
 	DrawText("'R' to reset.", 5, 36, 15, GAME.game_over ? ColorAlpha(GAME.won ? GREEN : YELLOW, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : WHITE);
+
+	DrawRectangle(GAME_WIDTH / 4 - 8 + 2, 6 + 2, 90, 40, BLACK);
+	DrawRectangle(GAME_WIDTH / 4 - 8, 6, 90, 40, GetColor(0x181818FF));
+
+	unsigned int total_seconds_played = (unsigned int)(GAME.time_end - GAME.time_start);
+	unsigned int minutes = total_seconds_played / 60;
+	unsigned int seconds_in_min = total_seconds_played % 60;
+	snprintf(buff, sizeof(buff), "%02i:%02i", minutes, seconds_in_min);
+	int length = (90 - MeasureText(buff, 30)) / 2;
+	DrawText(buff, GAME_WIDTH / 4 + length - 7, 12, 30, RED);
+
 	DrawText("MINESWEEPER", GAME_WIDTH / 2 + 2, 12 + 2, 30, BLACK);
 	DrawText("MINESWEEPER", GAME_WIDTH / 2, 12, 30, WHITE);
 }
