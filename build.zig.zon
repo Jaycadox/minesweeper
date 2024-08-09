@@ -1,0 +1,12 @@
+.{
+    .name = "minesweeper",
+    .version = "0.0.0",
+    .dependencies = .{
+        .raylib = .{
+            .path = "raylib"
+        },
+    },
+    .paths = .{
+        "",
+    },
+}
