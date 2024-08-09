@@ -286,6 +286,7 @@ void draw_menu (Texture2D* flag) {
 
 	DrawRectangle(5 + 2, 5 + 2, 30, 30, BLACK);
 	DrawTextureEx(*flag, (Vector2){5, 5}, 0.0f, 2.0f, WHITE);
+	DrawText(buff, (GAME_WIDTH / BOARD_SIZE) + 12 + 2, 12 + 2, 20, BLACK);
 	DrawText(buff, (GAME_WIDTH / BOARD_SIZE) + 12, 12, 20, WHITE);
 	
 	const char* reset_text = GAME.mines_generated ? "'R' to reset." : "by jayphen";
