@@ -47,7 +47,8 @@ struct game {
 	struct tile tiles[BOARD_SIZE * BOARD_SIZE];
 	bool mines_generated;
 	unsigned short num_flags;
-	bool lost;
+	bool game_over;
+	bool won;
 };
 
 static struct game GAME = {0};
@@ -122,13 +123,13 @@ void generate_mines (void) {
 
 			if (y == 0) {
 				start_y_off = 0;
-			} else if (y == BOARD_SIZE) {
+			} else if (y == BOARD_SIZE - 1) {
 				end_y_off = 0;
 			}
 
 			if (x == 0) {
 				start_x_off = 0;
-			} else if (x == BOARD_SIZE) {
+			} else if (x == BOARD_SIZE - 1) {
 				end_x_off = 0;
 			}
 
@@ -196,7 +197,7 @@ void handle_inputs (void) {
 		reset_game();		
 	}
 
-	if ((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) && !GAME.lost) {
+	if ((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) && !GAME.game_over) {
 		enum tile_type type = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ? TILE_TYPE_OPEN : TILE_TYPE_FLAG;
 		if (type == TILE_TYPE_FLAG && GAME.num_flags == 0) {
 			return;
@@ -223,14 +224,28 @@ void handle_inputs (void) {
 
 			if (type == TILE_TYPE_OPEN && GAME.tiles[idx].mine) {
 				// Game lost
-				GAME.lost = true;
-				for (unsigned short i = 0; i <= (BOARD_SIZE*BOARD_SIZE); ++i) {
+				GAME.game_over = true;
+				for (unsigned short i = 0; i < (BOARD_SIZE*BOARD_SIZE); ++i) {
 					if (GAME.tiles[i].mine) {
 						GAME.tiles[i].type = TILE_TYPE_OPEN;
 					}
 				}
 			}
 			GAME.tiles[idx].type = type;
+
+			// Check to see if player won, zero remaining flags, with all flags on mines
+			if (GAME.num_flags == 0 && type == TILE_TYPE_FLAG) {
+				GAME.won = true;
+				GAME.game_over = true;
+				for (unsigned short i = 0; i < (BOARD_SIZE*BOARD_SIZE); ++i) {
+					if (GAME.tiles[i].mine && GAME.tiles[i].type != TILE_TYPE_FLAG) {
+						GAME.won = false;
+						GAME.game_over = false;
+						printf("%i\n", i);
+						break;
+					}
+				}
+			}
 
 			if (!GAME.mines_generated) {
 				generate_mines();
@@ -250,7 +265,7 @@ void draw_menu (Texture2D* flag) {
 
 	DrawTextureEx(*flag, (Vector2){5, 5}, 0.0f, 2.0f, WHITE);
 	DrawText(buff, (GAME_WIDTH / BOARD_SIZE) + 12, 12, 20, WHITE);
-	DrawText("'R' to reset.", 5, 36, 15, GAME.lost ? ColorAlpha(YELLOW, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : WHITE);
+	DrawText("'R' to reset.", 5, 36, 15, GAME.game_over ? ColorAlpha(GAME.won ? GREEN : YELLOW, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : WHITE);
 	DrawText("MINESWEEPER", GAME_WIDTH / 2 + 2, 12 + 2, 30, BLACK);
 	DrawText("MINESWEEPER", GAME_WIDTH / 2, 12, 30, WHITE);
 }
