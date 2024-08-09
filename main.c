@@ -198,6 +198,9 @@ void handle_inputs (void) {
 
 	if ((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) && !GAME.lost) {
 		enum tile_type type = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ? TILE_TYPE_OPEN : TILE_TYPE_FLAG;
+		if (type == TILE_TYPE_FLAG && GAME.num_flags == 0) {
+			return;
+		}
 
 		// Get row and col of mouse
 		Vector2 pos = GetMousePosition();
@@ -212,7 +215,7 @@ void handle_inputs (void) {
 
 		unsigned char idx = y * BOARD_SIZE + x;
 		if (!(GAME.tiles[idx].type == TILE_TYPE_OPEN && type == TILE_TYPE_FLAG)) {
-			if (type == TILE_TYPE_FLAG) {
+			if (type == TILE_TYPE_FLAG && GAME.tiles[idx].type != TILE_TYPE_FLAG) {
 				--GAME.num_flags;
 			} else if (type == TILE_TYPE_OPEN && GAME.tiles[idx].type == TILE_TYPE_FLAG) {
 				++GAME.num_flags;
