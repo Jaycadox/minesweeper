@@ -11,7 +11,7 @@
 #define TITLE_HEIGHT 50
 
 #define BOARD_SIZE 16
-#define MINE_COUNT 40
+static unsigned char MINE_COUNT = 40;
 
 static unsigned char TILE_PNG[] = {
 #include "./assets/tile_c.h"
@@ -205,6 +205,17 @@ void flood_fill (unsigned char idx) {
 void handle_inputs (void) {
 	if (IsKeyPressed(KEY_R)) {
 		reset_game();		
+	}
+
+	if (!GAME.mines_generated) {
+		if (IsKeyPressed(KEY_UP) && MINE_COUNT < 100) {
+			++MINE_COUNT;	
+			GAME.num_flags = MINE_COUNT;
+		}
+		if (IsKeyPressed(KEY_DOWN) && MINE_COUNT > 1) {
+			--MINE_COUNT;	
+			GAME.num_flags = MINE_COUNT;
+		}
 	}
 
 	if ((IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) && !GAME.game_over) {
