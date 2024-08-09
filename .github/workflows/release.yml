@@ -25,15 +25,11 @@ jobs:
       run: sudo apt-get -y install libgl-dev libx11-dev libxcursor-dev libxkbcommon-dev libxkbcommon-x11-dev libxrandr-dev libxinerama-dev xorg-dev libwayland-egl1 libwayland-dev
     - name: Build for Linux
       run: zig build --release=fast
-    - name: Rename file
-      run: mv zig-out/bin/minesweeper zig-out/bin/minesweeper
     - name: Strip file
       run: strip zig-out/bin/minesweeper
         
     - name: Build for Windows
       run: zig build -Dtarget=x86_64-windows --release=fast
-    - name: Rename file Windows
-      run: mv zig-out/bin/minesweeper.exe zig-out/bin/minesweeper.exe
     
     - name: Create Release
       id: create_release
