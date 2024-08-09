@@ -1,0 +1,48 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Get Zig
+      uses: goto-bus-stop/setup-zig@v2
+      with:
+        version: 0.13.0
+    - name: Get deps
+      run: sudo apt-get -y install libgl-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev xorg-dev
+
+  
+    - name: Build for Linux
+      run: zig build --release=fast
+    - name: Rename file
+      run: mv zig-out/bin/minesweeper zig-out/bin/minesweeper
+    - name: Strip file
+      run: strip zig-out/bin/minesweeper
+        
+    - name: Build for Windows
+      run: zig build -Dtarget=x86_64-windows --release=fast
+    - name: Rename file Windows
+      run: mv zig-out/bin/minesweeper.exe zig-out/bin/minesweeper.exe
+    
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: autobuild-${{ github.run_number }}
+        body: Automatically generated build
+        files: |
+          ./zig-out/bin/minesweeper.exe
+          ./zig-out/bin/minesweeper
