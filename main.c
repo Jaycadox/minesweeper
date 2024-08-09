@@ -273,9 +273,14 @@ void draw_menu (Texture2D* flag) {
 	char buff[12] = {0};
 	snprintf(buff, sizeof(buff), "%i", GAME.num_flags);
 
+	DrawRectangle(5 + 2, 5 + 2, 30, 30, BLACK);
 	DrawTextureEx(*flag, (Vector2){5, 5}, 0.0f, 2.0f, WHITE);
 	DrawText(buff, (GAME_WIDTH / BOARD_SIZE) + 12, 12, 20, WHITE);
-	DrawText("'R' to reset.", 5, 36, 15, GAME.game_over ? ColorAlpha(GAME.won ? GREEN : YELLOW, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : WHITE);
+	
+	const char* reset_text = GAME.mines_generated ? "'R' to reset." : "by jayphen";
+
+	DrawText(reset_text, 5 + 2, 36 + 2, 15, GAME.game_over ? ColorAlpha(GAME.won ? BLACK : BLACK, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : BLACK);
+	DrawText(reset_text, 5, 36, 15, GAME.game_over ? ColorAlpha(GAME.won ? GREEN : YELLOW, 0.2f * sinf(GetTime() * 20.0f) + 0.8f) : WHITE);
 
 	DrawRectangle(GAME_WIDTH / 4 - 8 + 2, 6 + 2, 90, 40, BLACK);
 	DrawRectangle(GAME_WIDTH / 4 - 8, 6, 90, 40, GetColor(0x181818FF));
@@ -330,6 +335,7 @@ void draw_tiles (Texture2D* tile, Texture2D* blank_tile, Texture2D* flag_tile, T
 					case 5: col = VIOLET; break;
 				}
 
+				DrawText(buff, x_offset + text_offset + 2, y_offset + 1 + 2, 30, BLACK);
 				DrawText(buff, x_offset + text_offset, y_offset + 1, 30, col);
 			}
 
